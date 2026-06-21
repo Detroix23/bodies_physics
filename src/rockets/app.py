@@ -5,7 +5,8 @@
 import pyxel
 
 from utilities.vectors import Vector2D
-from utilities.objects import SceneObject
+from utilities.objects import Entity, SceneObject
+from utilities import draw
 from rockets.state import State
 from rockets.thrusters import Thruster
 from rockets.node import Node
@@ -43,16 +44,18 @@ class App(SceneObject):
         print("(?) rockets.app.App.run() Start...")
 
         self.state.entities[0] = Node(
-            0,
-            0.0,
-            Vector2D(50.0, 50.0),
-            2.0,
+            id=0,
+            state=self.state,
+            rotation=0.0,
+            position=Vector2D(50.0, 50.0),
+            drag=0.9,
+            mass=2.0,
             thrusters={
                 0: Thruster(
                     0,
                     0.0,
                     10.0,
-                    pyxel.KEY_UP,
+                    pyxel.KEY_W,
                 )
             },
             links={},
@@ -61,15 +64,50 @@ class App(SceneObject):
         pyxel.run(self.update, self.draw)
 
     def update(self) -> None:
+        self.state.camera.update()
+
         for entity in self.state.entities.values():
             entity.update()
         
         return
     
+    def draw_text(self) -> None:
+        """
+        Draw all UI text.
+        """
+        node1: Entity = self.state.entities[0]
+        
+        for index, text in enumerate([
+            "Camera: ",
+            f"p={self.state.camera.position.decimal(2)}",
+            f"z={self.state.camera.zoom:.4f}",
+            "Node1: ",
+            f"p={node1.get_position().decimal(2)}",
+            f"v={node1.get_velocity().decimal(2)}",
+        ]):
+            pyxel.text(10, 10 + index * 10, text, pyxel.COLOR_WHITE)
+
+        return
+
     def draw(self) -> None:
         pyxel.cls(pyxel.COLOR_BLACK)
 
+        draw.rectangle(
+            self.state.camera,
+            0, 10,
+            20, 40,
+            pyxel.COLOR_DARK_BLUE,
+        )
+        draw.rectangle(
+            self.state.camera,
+            -2, -2,
+            4, 4,
+            pyxel.COLOR_WHITE,
+        )
+
         for entity in self.state.entities.values():
             entity.draw()
+
+        self.draw_text()
 
         return

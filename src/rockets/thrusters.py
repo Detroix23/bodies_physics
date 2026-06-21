@@ -14,7 +14,7 @@ class Thruster(UpdatableObject):
     direction: float
     """ Angle added from the rocket's axis. """
     force: float
-    """ In `force` **N** (Newtons): 1 **kg*m/s^2**"""
+    """ In `force` **N** (Newtons): 1 **kg*m/s²**"""
     _on: bool
     key: int
     """ Keyboard `key` that enables the thruster. """

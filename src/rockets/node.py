@@ -6,8 +6,11 @@ import math
 
 import pyxel
 
+from utilities.definitions import GRAVITATIONAL_CONSTANT, UP_SHIFT
 from utilities.vectors import Vector2D
 from utilities.objects import Entity
+from utilities import draw
+from rockets.state import State
 from rockets.thrusters import Thruster
 
 class Node(Entity):
@@ -16,9 +19,11 @@ class Node(Entity):
     Can hold thruster.
     """
     _id: int
+    state: State
     rotation: float
     position: Vector2D
     velocity: Vector2D
+    drag: float
     size: float
     mass: float
     thrusters: dict[int, Thruster]
@@ -27,8 +32,10 @@ class Node(Entity):
     def __init__(
         self,
         id: int,
+        state: State,
         rotation: float,
         position: Vector2D,
+        drag: float,
         mass: float,
         thrusters: dict[int, Thruster],
         links: dict['Node', float],
@@ -37,9 +44,11 @@ class Node(Entity):
         Instantiate a rocket `Node`.
         """
         self._id = id
+        self.state = state
         self.rotation = rotation
         self.position = position
         self.velocity = Vector2D(0.0, 0.0)
+        self.drag = drag
         self.size = 5.0
         self.mass = mass
         self.thrusters = thrusters
@@ -73,11 +82,21 @@ class Node(Entity):
                 speed: float = thruster.force / self.mass
                 direction: float = self.rotation + thruster.direction 
                 self.velocity += Vector2D(
-                    math.cos(direction) * speed,
-                    math.sin(direction) * speed,
+                    math.cos(direction + UP_SHIFT) * speed,
+                    math.sin(direction + UP_SHIFT) * speed,
                 )
 
                 # thruster.disable()
+
+    def apply_world(self) -> None:
+        """
+        Apply air drag and gravity to the `velocity` vector.
+        """
+        self.velocity += Vector2D(0.0, -GRAVITATIONAL_CONSTANT)
+
+        self.velocity *= self.drag
+
+        return
 
     def apply_velocity(self) -> None:
         """
@@ -93,13 +112,14 @@ class Node(Entity):
             thruster.update()
 
         self.apply_thrust()
-
+        self.apply_world()
         self.apply_velocity()
 
         return
 
     def draw(self) -> None:
-        pyxel.rect(
+        draw.rectangle(
+            self.state.camera,
             self.position.x - self.size / 2,
             self.position.y - self.size / 2,
             self.size / 2,

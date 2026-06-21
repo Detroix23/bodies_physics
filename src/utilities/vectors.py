@@ -201,6 +201,12 @@ class Vector2D:
             and abs(self.y - other.y) < offset
         )
 
+    def decimal(self, places: int) -> str:
+        """
+        Return a `str` of `self` with `places` digits after the zero.
+        """ 
+        return f"{self.x:.{places}f};{self.y:.{places}f}"
+
     def draw_on(
         self, 
         x: float, 
