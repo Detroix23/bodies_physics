@@ -109,7 +109,6 @@ class Vector2D:
         magnitude: float = self.magnitude()
         self.x = self.x / magnitude
         self.y = self.y / magnitude
-    
         
     def to_list(self) -> list[float]:
         """

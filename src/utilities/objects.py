@@ -4,6 +4,8 @@
 """
 import abc
 
+from utilities.vectors import Vector2D
+
 class DrawableObject(abc.ABC):
     """
     # `DrawableObject` in `pyxel`.
@@ -31,3 +33,37 @@ class SceneObject(UpdatableObject, DrawableObject):
     - `UpdatableObject`;
     - `DrawableObject`.
     """
+
+class Entity(SceneObject):
+    """
+    # `Entity`: `SceneObject` with physic properties.
+    """
+    @abc.abstractmethod
+    def get_id(self) -> int:
+        """
+        Get immutable unique `self` ID.
+        """
+    
+    @abc.abstractmethod
+    def get_position(self) -> Vector2D:
+        """
+        Get current `self` position.
+        """
+    
+    @abc.abstractmethod
+    def set_position(self, vector: Vector2D) -> None:
+        """
+        Update `self` `position`.
+        """
+
+    @abc.abstractmethod
+    def get_velocity(self) -> Vector2D:
+        """
+        Get current `self` velocity.
+        """
+    
+    @abc.abstractmethod
+    def set_velocity(self, vector: Vector2D) -> None:
+        """
+        Update `self` `velocity`.
+        """
