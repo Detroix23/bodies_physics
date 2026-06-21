@@ -52,11 +52,11 @@ class App(SceneObject):
             mass=2.0,
             thrusters={
                 0: Thruster(
-                    0,
-                    0.0,
-                    10.0,
-                    pyxel.KEY_W,
-                )
+                    id=0,
+                    direction=0.0,
+                    force=30.0,
+                    key=pyxel.KEY_W,
+                ),
             },
             links={},
         )
@@ -94,15 +94,15 @@ class App(SceneObject):
 
         draw.rectangle(
             self.state.camera,
-            0, 10,
-            20, 40,
-            pyxel.COLOR_DARK_BLUE,
+            -5, 5,
+            10, 10,
+            pyxel.COLOR_WHITE,
         )
         draw.rectangle(
             self.state.camera,
-            -2, -2,
-            4, 4,
-            pyxel.COLOR_WHITE,
+            -500, 0,
+            1000, 2,
+            pyxel.COLOR_DARK_BLUE,
         )
 
         for entity in self.state.entities.values():

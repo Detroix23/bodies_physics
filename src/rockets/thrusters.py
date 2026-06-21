@@ -24,7 +24,7 @@ class Thruster(UpdatableObject):
         id: int,
         direction: float,
         force: float,
-        key: int
+        key: int = pyxel.KEY_NONE,
     ) -> None:
         """
         Instantiate the `Thruster`.

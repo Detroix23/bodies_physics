@@ -49,7 +49,7 @@ class Node(Entity):
         self.position = position
         self.velocity = Vector2D(0.0, 0.0)
         self.drag = drag
-        self.size = 5.0
+        self.size = 15.0
         self.mass = mass
         self.thrusters = thrusters
         self.links = links
