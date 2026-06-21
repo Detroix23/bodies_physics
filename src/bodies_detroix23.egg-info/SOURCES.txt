@@ -1,0 +1,14 @@
+LICENSE.md
+README.md
+pyproject.toml
+src/bodies_detroix23.egg-info/PKG-INFO
+src/bodies_detroix23.egg-info/SOURCES.txt
+src/bodies_detroix23.egg-info/dependency_links.txt
+src/bodies_detroix23.egg-info/requires.txt
+src/bodies_detroix23.egg-info/top_level.txt
+src/rockets/__init__.py
+src/rockets/__main__.py
+src/rockets/app.py
+src/utilities/__init__.py
+src/utilities/objects.py
+src/utilities/vectors.py
