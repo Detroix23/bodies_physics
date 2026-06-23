@@ -33,13 +33,13 @@ class Camera(UpdatableObject):
         Move the camera listening to inputs.
         """
         if pyxel.btn(pyxel.KEY_UP):
-            self.velocity.y = -self.speed_pan
+            self.velocity.y = -self.speed_pan * self.zoom
         if pyxel.btn(pyxel.KEY_DOWN):
-            self.velocity.y = self.speed_pan
+            self.velocity.y = self.speed_pan * self.zoom
         if pyxel.btn(pyxel.KEY_LEFT):
-            self.velocity.x = -self.speed_pan
+            self.velocity.x = -self.speed_pan * self.zoom
         if pyxel.btn(pyxel.KEY_RIGHT):
-            self.velocity.x = self.speed_pan
+            self.velocity.x = self.speed_pan * self.zoom
 
         if pyxel.mouse_wheel != 0:
             self.zoom *= self.speed_scroll ** pyxel.mouse_wheel
