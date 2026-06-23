@@ -5,12 +5,16 @@
 import pyxel
 
 from utilities.objects import UpdatableObject
+from rockets.state import State
+from rockets.vehicle_states import VehicleState
 
 class Thruster(UpdatableObject):
     """
     # Rocket `Thruster`, attached to a `Node`.
     """
     id: int
+    state: State
+    vehicle_state: VehicleState
     direction: float
     """ Angle added from the rocket's axis. """
     force: float
@@ -22,6 +26,8 @@ class Thruster(UpdatableObject):
     def __init__(
         self,
         id: int,
+        state: State,
+        vehicle_state: VehicleState,
         direction: float,
         force: float,
         key: int = pyxel.KEY_NONE,

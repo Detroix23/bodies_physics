@@ -23,6 +23,7 @@ class Node(Entity):
     state: State
     vehicle_state: VehicleState
     relative_position: Vector2D
+    center: Vector2D
     """ relative, in **m**. """
     velocity: Vector2D
     """ in **m/s**. """
@@ -33,6 +34,7 @@ class Node(Entity):
     mass: float
     """ in **kg**. """
     thrusters: dict[int, Thruster]
+
 
     def __init__(
         self,
@@ -52,6 +54,7 @@ class Node(Entity):
         self.state = state
         self.vehicle_state = vehicle_state
         self.relative_position = relative_position
+        self.center = Vector2D(0.0, 0.0)
         self.velocity = Vector2D(0.0, 0.0)
         self.drag = drag
         self.size = size
@@ -84,11 +87,12 @@ class Node(Entity):
         for thruster in self.thrusters.values():
             if thruster.is_on():
                 speed: float = thruster.force / self.mass
-                direction: float = self.vehicle_state.rotation + thruster.direction 
+                direction: float = self.vehicle_state.rotation + thruster.direction + UP_SHIFT
+                
                 self.velocity += Vector2D(
-                    math.cos(direction + UP_SHIFT) * speed,
-                    math.sin(direction + UP_SHIFT) * speed,
-                )
+                    math.cos(direction),
+                    math.sin(direction),
+                ) * speed
         
         return
 
@@ -111,17 +115,44 @@ class Node(Entity):
 
         return
 
+    def draw_thrust(self) -> None:
+        """
+        Check the `thrusters` and draw their force.
+        """
+        for thruster in self.thrusters.values():
+            if thruster.is_on():
+                direction: float = self.vehicle_state.rotation + thruster.direction + UP_SHIFT
+                
+                thrust: Vector2D = Vector2D(
+                    math.cos(direction),
+                    math.sin(direction),
+                ) * -thruster.force
+
+                draw.line(
+                    self.state.camera,
+                    self.center.x,
+                    self.center.y,
+                    self.center.x + thrust.x,
+                    self.center.y + thrust.y,
+                    pyxel.COLOR_ORANGE,
+                )
+        
+        return
+    
+
     def draw(self) -> None:
-        center: Vector2D = (
+        self.center = (
             self.vehicle_state.position
             + self.relative_position 
             - self.vehicle_state.center_mass
         )
-        
+
+        self.draw_thrust()
+
         draw.rectangle(
             self.state.camera,
-            center.x - self.size / 2,
-            center.y + self.size / 2,
+            self.center.x - self.size / 2,
+            self.center.y + self.size / 2,
             self.size,
             self.size,
             pyxel.COLOR_CYAN,

@@ -70,6 +70,8 @@ class App(SceneObject):
                     thrusters={
                         0: Thruster(
                             id=0,
+                            state=self.state,
+                            vehicle_state=vehicle1_state,
                             direction=0.0,
                             force=30.0,
                             key=pyxel.KEY_W,
@@ -103,6 +105,8 @@ class App(SceneObject):
                     thrusters={
                         0: Thruster(
                             id=0,
+                            state=self.state,
+                            vehicle_state=vehicle2_state,
                             direction=0.0,
                             force=50.0,
                             key=pyxel.KEY_E,
@@ -120,6 +124,8 @@ class App(SceneObject):
                     thrusters={
                         0: Thruster(
                             id=0,
+                            state=self.state,
+                            vehicle_state=vehicle2_state,
                             direction=math.pi / 2,
                             force=15.0,
                             key=pyxel.KEY_F,
