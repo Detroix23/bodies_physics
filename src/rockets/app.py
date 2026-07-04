@@ -2,18 +2,13 @@
 # Rockets
 /src/rockets/app.py
 """
-import math
-
 import pyxel
 
-from utilities.vectors import Vector2D
 from utilities.objects import SceneObject
 from utilities import draw
 from rockets.state import State
-from rockets.vehicle_states import VehicleState
-from rockets.thrusters import Thruster
-from rockets.nodes import Node
-from rockets.vehicles import Vehicle
+from rockets import presets
+
 
 class App(SceneObject):
     """
@@ -29,7 +24,7 @@ class App(SceneObject):
         Does not run it: start with `run`.
         """
         self.state = State(
-            delta_time=0.1,
+            delta_time=0.01,
         )
         self.lines = []
         print("(?) rockets.app.App.__init__() State initialized.")
@@ -49,103 +44,10 @@ class App(SceneObject):
         """
         Load the arbitrary chosen starting assets.
         """
-        '''
-        vehicle1_state: VehicleState = VehicleState(
-            position=Vector2D(-50.0, 5000),
-            velocity=Vector2D(0.0, 10.0),
-            acceleration=Vector2D.null(),
-            force=Vector2D.null(),
-            rotation=0.0
-        )
+        # self.state.entities[0] = presets.vehicle_simple1_1_1(self.state)
 
-        self.state.entities[0] = Vehicle(
-            id=0,
-            state=self.state,
-            vehicle_state=vehicle1_state,
-            nodes=[
-                Node(
-                    id=0,
-                    state=self.state,
-                    vehicle_state=vehicle1_state,
-                    relative_position=Vector2D.null(),
-                    drag=0.1,
-                    mass=2.0,
-                    size=7.0,
-                    thrusters={
-                        0: Thruster(
-                            id=0,
-                            state=self.state,
-                            vehicle_state=vehicle1_state,
-                            direction=0.0,
-                            force=30.0,
-                            key=pyxel.KEY_W,
-                        ),
-                    },
-                ),
-            ],
-            node_links={}
-        )   
-        '''
-
-        vehicle2_state: VehicleState = VehicleState(
-            drag_coefficient=0.8,
-            position=Vector2D(75.0, 5000.0),
-            velocity=Vector2D(0.0, 10.0),
-            acceleration=Vector2D.null(),
-            force=Vector2D.null(),
-            rotation=0.0
-        )
-
-        self.state.entities[1] = Vehicle(
-            id=1,
-            state=self.state,
-            vehicle_state=vehicle2_state,
-            nodes=[
-                Node(
-                    id=0,
-                    state=self.state,
-                    vehicle_state=vehicle2_state,
-                    relative_position=Vector2D.null(),
-                    drag=0.1,
-                    mass=2.0,
-                    size=7.0,
-                    thrusters={
-                        0: Thruster(
-                            id=0,
-                            state=self.state,
-                            vehicle_state=vehicle2_state,
-                            direction=0.0,
-                            force=50.0,
-                            key=pyxel.KEY_E,
-                        ),
-                    },
-                ),
-                Node(
-                    id=1,
-                    state=self.state,
-                    vehicle_state=vehicle2_state,
-                    relative_position=Vector2D(25.0, 5.0),
-                    drag=0.1,
-                    mass=2.0,
-                    size=7.0,
-                    thrusters={
-                        0: Thruster(
-                            id=0,
-                            state=self.state,
-                            vehicle_state=vehicle2_state,
-                            direction=math.pi / 2,
-                            force=15.0,
-                            key=pyxel.KEY_F,
-                        ),
-                    },
-                ),
-            ],
-            node_links={
-                0: [1],
-                1: [0],
-            }
-        )
-
+        self.state.entities[1] = presets.vehicle_rocket1_2_2(self.state)
+        
         return
 
     def run(self) -> None:

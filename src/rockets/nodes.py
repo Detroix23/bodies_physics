@@ -9,7 +9,7 @@ import pyxel
 from utilities.definitions import UP_SHIFT
 from utilities.vectors import Vector2D
 from utilities.objects import SceneObject
-from utilities import draw
+from utilities import draw, matrices
 from rockets.state import State
 from rockets.vehicle_states import VehicleState
 from rockets.thrusters import Thruster
@@ -23,6 +23,11 @@ class Node(SceneObject):
     state: State
     vehicle_state: VehicleState
     _relative_position: Vector2D
+    """ Relative to the body center. """
+    rotated_position: Vector2D
+    """ Relative rotated to the body center. """
+    absolute_position: Vector2D 
+    """ Absolute rotated. """
     center: Vector2D
     """ relative, in **m**. """
     drag: float
@@ -52,6 +57,8 @@ class Node(SceneObject):
         self.state = state
         self.vehicle_state = vehicle_state
         self._relative_position = relative_position
+        self.rotated_position = relative_position
+        self.absolute_position = self.vehicle_state.position + relative_position
         self.center = Vector2D.null()
         self.drag = drag
         self.size = size
@@ -73,6 +80,13 @@ class Node(SceneObject):
         for thruster in self.thrusters.values():
             thruster.update()
 
+        self.rotated_position = matrices.rotate(
+            self.get_position(), 
+            self.vehicle_state.rotation
+        )
+
+        self.absolute_position = self.rotated_position + self.vehicle_state.position
+
         return
 
     def draw_thrust(self) -> None:
@@ -81,8 +95,12 @@ class Node(SceneObject):
         """
         for thruster in self.thrusters.values():
             if thruster.is_on():
-                direction: float = self.vehicle_state.rotation + thruster.direction + UP_SHIFT
-                
+                direction: float = (
+                    self.vehicle_state.rotation 
+                    + thruster.direction 
+                    + UP_SHIFT
+                )
+
                 thrust: Vector2D = Vector2D(
                     math.cos(direction),
                     math.sin(direction),
@@ -102,8 +120,7 @@ class Node(SceneObject):
 
     def draw(self) -> None:
         self.center = (
-            self.vehicle_state.position
-            + self.get_position() 
+            self.absolute_position
             - self.vehicle_state.center_mass
         )
 

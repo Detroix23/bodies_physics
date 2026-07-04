@@ -319,8 +319,8 @@ class Vehicle(Entity):
         for node, links in self.node_links.items():
             for link in links:
                 center: Vector2D = self.vehicle_state.position - self.vehicle_state.center_mass
-                node_position: Vector2D = self.nodes[node].get_position()
-                link_position: Vector2D = self.nodes[link].get_position()
+                node_position: Vector2D = self.nodes[node].rotated_position
+                link_position: Vector2D = self.nodes[link].rotated_position
                 
                 draw.line(
                     self.state.camera,

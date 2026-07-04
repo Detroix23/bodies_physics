@@ -26,4 +26,5 @@ class State:
         self.delta_time = delta_time
         self.camera = Camera()
         self.entities = dict()
-    
+
+        return
