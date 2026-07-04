@@ -16,9 +16,9 @@ class Thruster(UpdatableObject):
     state: State
     vehicle_state: VehicleState
     direction: float
-    """ Angle added from the rocket's axis. """
+    """ Angle in radians added from the rocket's axis. """
     force: float
-    """ In `force` **N** (Newtons): 1 **kg*m/s²**"""
+    """ In `force` **N** (Newtons): 1 **kg·m/s²**"""
     _on: bool
     key: int
     """ Keyboard `key` that enables the thruster. """
@@ -36,6 +36,8 @@ class Thruster(UpdatableObject):
         Instantiate the `Thruster`.
         """
         self.id = id
+        self.state = state
+        self.vehicle_state = vehicle_state
         self.direction = direction
         self.force = force
         self._on = False

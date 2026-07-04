@@ -7,6 +7,9 @@ from typing import Union, Self
 
 import pyxel
 
+Any2D = Union['Vector2D']
+
+ScalarOrVector = Union[float, int, 'Vector2D']
 
 class Vector2D:
     """
@@ -36,7 +39,7 @@ class Vector2D:
 
     def __add__(
         self, 
-        value: Union[float, int, 'Vector2D']
+        value: ScalarOrVector
     ) -> 'Vector2D':
         """
         Add values to the vector, emulating numeric objects.
@@ -49,7 +52,7 @@ class Vector2D:
 
     def __sub__(
         self, 
-        value: Union[float, int, 'Vector2D']
+        value: ScalarOrVector
     ) -> 'Vector2D':
         """
         Add values to the vector, emulating numeric objects.
@@ -79,6 +82,13 @@ class Vector2D:
         Do not update the content of the vector
         """
         return Vector2D(self.x / factor, self.y / factor)
+
+    @staticmethod
+    def null() -> 'Vector2D':
+        """
+        Create the `0` vector.
+        """
+        return Vector2D(0.0, 0.0)
 
     def copy(self) -> 'Vector2D':
         """
@@ -110,6 +120,14 @@ class Vector2D:
         self.x = self.x / magnitude
         self.y = self.y / magnitude
         
+    def get_normal(self) -> 'Vector2D':
+        """
+        Returns a normalized **copy** of the vector. 
+        """
+        copy: Vector2D = self.copy()
+        copy.normalize()
+        return copy 
+    
     def to_list(self) -> list[float]:
         """
         Convert `self` to a `list`: `[x, y]`.
@@ -128,7 +146,7 @@ class Vector2D:
         """
         return (self.x, self.y)
 
-    def add(self, value: Union[float, int, 'Vector2D']) -> Self:
+    def add(self, value: ScalarOrVector) -> Self:
         """
         Add values to the vector.
         Do update the value of the vector.
@@ -142,7 +160,7 @@ class Vector2D:
 
         return self
     
-    def subtract(self, value: Union[float, int, 'Vector2D']) -> Self:
+    def subtract(self, value: ScalarOrVector) -> Self:
         """
         Add values to the vector.
         Do update the value of the vector.
@@ -185,6 +203,12 @@ class Vector2D:
         """
         return self.x * other.x + self.y * other.y
     
+    def cross(self, other: 'Vector2D') -> float:
+        """
+        2D cross product `a` × `b`.
+        """
+        return cross(self, other)
+
     def zero(self) -> None:
         """
         Set all coordinate to zero.  
@@ -225,3 +249,10 @@ class Vector2D:
                 y + self.y * size, 
                 col=color
             )
+
+
+def cross(a: Any2D, b: Any2D) -> float:
+    """
+    2D cross product `a` × `b`.
+    """
+    return a.x * b.y - a.y * b.x

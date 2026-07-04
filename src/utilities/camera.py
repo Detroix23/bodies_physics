@@ -22,8 +22,8 @@ class Camera(UpdatableObject):
         """
         Instantiate the global `Camera`.
         """
-        self.position = Vector2D(0.0, 0.0)
-        self.velocity = Vector2D(0.0, 0.0)
+        self.position = Vector2D.null()
+        self.velocity = Vector2D.null()
         self.zoom = 1.0
     
         return

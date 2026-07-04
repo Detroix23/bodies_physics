@@ -6,15 +6,15 @@ import math
 
 import pyxel
 
-from utilities.definitions import GRAVITATIONAL_CONSTANT, UP_SHIFT
+from utilities.definitions import UP_SHIFT
 from utilities.vectors import Vector2D
-from utilities.objects import Entity
+from utilities.objects import SceneObject
 from utilities import draw
 from rockets.state import State
 from rockets.vehicle_states import VehicleState
 from rockets.thrusters import Thruster
 
-class Node(Entity):
+class Node(SceneObject):
     """
     # Rocket body `Node`.
     Can hold thruster.
@@ -22,11 +22,9 @@ class Node(Entity):
     _id: int
     state: State
     vehicle_state: VehicleState
-    relative_position: Vector2D
+    _relative_position: Vector2D
     center: Vector2D
     """ relative, in **m**. """
-    velocity: Vector2D
-    """ in **m/s**. """
     drag: float
     """ Dimension-less coefficient that scales`velocity`. """
     size: float
@@ -53,9 +51,8 @@ class Node(Entity):
         self._id = id
         self.state = state
         self.vehicle_state = vehicle_state
-        self.relative_position = relative_position
-        self.center = Vector2D(0.0, 0.0)
-        self.velocity = Vector2D(0.0, 0.0)
+        self._relative_position = relative_position
+        self.center = Vector2D.null()
         self.drag = drag
         self.size = size
         self.mass = mass
@@ -67,51 +64,14 @@ class Node(Entity):
         return self._id
     
     def get_position(self) -> Vector2D:
-        return self.relative_position
-    
-    def set_position(self, vector: Vector2D) -> None:
-        self.relative_position = vector
-        return
-    
-    def get_velocity(self) -> Vector2D:
-        return self.velocity
-    
-    def set_velocity(self, vector: Vector2D) -> None:
-        self.velocity = vector
-        return
-
-    def apply_thrust(self) -> None:
         """
-        Check the `thrusters` and eventually apply the force.
+        Returns the read-only relative position.
         """
-        for thruster in self.thrusters.values():
-            if thruster.is_on():
-                speed: float = thruster.force / self.mass
-                direction: float = self.vehicle_state.rotation + thruster.direction + UP_SHIFT
-                
-                self.velocity += Vector2D(
-                    math.cos(direction),
-                    math.sin(direction),
-                ) * speed
-        
-        return
-
-    def apply_world(self) -> None:
-        """
-        Apply air drag and gravity to the `velocity` vector.
-        """
-        self.velocity.y -= GRAVITATIONAL_CONSTANT
-            
-        self.velocity *= (1.0 - self.drag)
-
-        return
+        return self._relative_position
 
     def update(self) -> None:
         for thruster in self.thrusters.values():
             thruster.update()
-
-        self.apply_thrust()
-        self.apply_world()
 
         return
 
@@ -143,7 +103,7 @@ class Node(Entity):
     def draw(self) -> None:
         self.center = (
             self.vehicle_state.position
-            + self.relative_position 
+            + self.get_position() 
             - self.vehicle_state.center_mass
         )
 

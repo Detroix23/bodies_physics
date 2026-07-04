@@ -28,7 +28,9 @@ class App(SceneObject):
 
         Does not run it: start with `run`.
         """
-        self.state = State()
+        self.state = State(
+            delta_time=0.1,
+        )
         self.lines = []
         print("(?) rockets.app.App.__init__() State initialized.")
 
@@ -47,10 +49,12 @@ class App(SceneObject):
         """
         Load the arbitrary chosen starting assets.
         """
+        '''
         vehicle1_state: VehicleState = VehicleState(
             position=Vector2D(-50.0, 5000),
             velocity=Vector2D(0.0, 10.0),
-            acceleration=Vector2D(0.0, 0.0),
+            acceleration=Vector2D.null(),
+            force=Vector2D.null(),
             rotation=0.0
         )
 
@@ -63,7 +67,7 @@ class App(SceneObject):
                     id=0,
                     state=self.state,
                     vehicle_state=vehicle1_state,
-                    relative_position=Vector2D(0.0, 0.0),
+                    relative_position=Vector2D.null(),
                     drag=0.1,
                     mass=2.0,
                     size=7.0,
@@ -81,11 +85,14 @@ class App(SceneObject):
             ],
             node_links={}
         )   
+        '''
 
         vehicle2_state: VehicleState = VehicleState(
+            drag_coefficient=0.8,
             position=Vector2D(75.0, 5000.0),
             velocity=Vector2D(0.0, 10.0),
-            acceleration=Vector2D(0.0, 0.0),
+            acceleration=Vector2D.null(),
+            force=Vector2D.null(),
             rotation=0.0
         )
 
@@ -98,7 +105,7 @@ class App(SceneObject):
                     id=0,
                     state=self.state,
                     vehicle_state=vehicle2_state,
-                    relative_position=Vector2D(0.0, 0.0),
+                    relative_position=Vector2D.null(),
                     drag=0.1,
                     mass=2.0,
                     size=7.0,
@@ -166,8 +173,17 @@ class App(SceneObject):
         for entity_id, entity in self.state.entities.items():
             self.lines += [
                 f"Entity {entity_id}: ",
-                f"- p={entity.get_position().decimal(2)}m",
-                f"- v={entity.get_velocity().decimal(2)}m/s",
+                f"- mas={entity.get_mass():.2f}kg",
+                "Linear:",
+                f"- pos={entity.get_position().decimal(2)}m",
+                f"- vel={entity.get_velocity().decimal(2)}m/s",
+                f"- acc={entity.get_acceleration().decimal(2)}m/s²",
+                f"- for={entity.get_force().decimal(2)}N",
+                "Angular",
+                f"- rot={entity.get_rotation():.2f}",
+                f"- vel={entity.get_angular_velocity():.2f}/s",
+                f"- acc={entity.get_angular_acceleration():.2f}/s²",
+                f"- tor={entity.get_torque():.2f}kg*m²/s²"
             ]
 
         return
