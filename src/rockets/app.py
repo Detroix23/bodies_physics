@@ -24,7 +24,9 @@ class App(SceneObject):
         Does not run it: start with `run`.
         """
         self.state = State(
-            delta_time=0.01,
+            delta_time=0.1,
+            gravitational_constant=0.0,
+            air_density=None,
         )
         self.lines = []
         print("(?) rockets.app.App.__init__() State initialized.")
@@ -46,7 +48,7 @@ class App(SceneObject):
         """
         # self.state.entities[0] = presets.vehicle_simple1_1_1(self.state)
 
-        self.state.entities[1] = presets.vehicle_rocket1_2_2(self.state)
+        self.state.entities[1] = presets.vehicle_rocket1_2_3(self.state)
         
         return
 

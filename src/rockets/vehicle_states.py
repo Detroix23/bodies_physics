@@ -4,8 +4,9 @@
 """
 from typing import Optional
 
-from utilities.general import default
 from utilities.vectors import Vector2D
+from utilities import general, matrices
+
 
 class VehicleState:
     """
@@ -35,7 +36,7 @@ class VehicleState:
     mass_total: float
     """ in **kg** """
     center_mass: Vector2D
-    """ in **m** """
+    """ Relative to the anchor (`position`), in **m** """
     moment_inertia: float
     """ in **kg·m²** """
 
@@ -60,14 +61,14 @@ class VehicleState:
         self.drag_coefficient = drag_coefficient
     
         self.position = position
-        self.velocity = default(velocity, Vector2D.null())
-        self.acceleration = default(acceleration, Vector2D.null())
-        self.force = default(force, Vector2D.null())
+        self.velocity = general.default(velocity, Vector2D.null())
+        self.acceleration = general.default(acceleration, Vector2D.null())
+        self.force = general.default(force, Vector2D.null())
 
-        self.rotation = default(rotation, 0.0)
-        self.angular_velocity = default(angular_velocity, 0.0)
-        self.angular_acceleration = default(angular_acceleration, 0.0)
-        self.torque = default(torque, 0.0)
+        self.rotation = general.default(rotation, 0.0)
+        self.angular_velocity = general.default(angular_velocity, 0.0)
+        self.angular_acceleration = general.default(angular_acceleration, 0.0)
+        self.torque = general.default(torque, 0.0)
 
         if mass_total is not None:
             self.mass_total = mass_total
@@ -78,3 +79,25 @@ class VehicleState:
 
         return
     
+    def get_absolute_com(self) -> Vector2D:
+        """
+        Get the absolute position of the center of mass.
+        """
+        return self.position + self.center_mass
+
+    def get_relative_anchor(self) -> Vector2D:
+        """
+        Get the arbitrary (0;0) body anchor 
+        relative to the center of mass. 
+        """
+        return matrices.rotate(
+            self.center_mass * (-1), 
+            self.rotation
+        )
+
+    def get_absolute_anchor(self) -> Vector2D:
+        """
+        Get the absolute position of the anchor 
+        rotated around the center of mass.
+        """
+        return self.get_absolute_com() + self.get_relative_anchor()

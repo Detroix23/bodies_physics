@@ -6,7 +6,7 @@ import math
 
 import pyxel
 
-from utilities.definitions import GRAVITATIONAL_CONSTANT, AIR_DENSITY_0
+from utilities.definitions import UP_SHIFT
 from utilities.vectors import Vector2D
 from utilities.objects import Entity
 from utilities import draw
@@ -142,7 +142,10 @@ class Vehicle(Entity):
         """
         Sums up all the node's masses.
         """
-        self.vehicle_state.mass_total = sum(node.mass for node in self.nodes.values())
+        self.vehicle_state.mass_total = sum(
+            node.mass 
+            for node in self.nodes.values()
+        )
         return self.vehicle_state.mass_total
     
     def find_center_of_mass(self) -> Vector2D:
@@ -186,9 +189,11 @@ class Vehicle(Entity):
         """
         Clamp position in the world bounds.
         """
+        bounce_factor: float = 0.3
+
         if self.vehicle_state.position.y <= 0.0:
             self.vehicle_state.position.y = 0.0
-            self.vehicle_state.velocity.y = 0.0
+            self.vehicle_state.velocity.y *= -bounce_factor
 
         return
 
@@ -197,7 +202,7 @@ class Vehicle(Entity):
         Apply gravitational force.
         """
         self.vehicle_state.force += (
-            Vector2D(0.0, -GRAVITATIONAL_CONSTANT) 
+            Vector2D(0.0, -self.state.gravitational_constant) 
             * self.vehicle_state.mass_total
         )
         return
@@ -210,7 +215,7 @@ class Vehicle(Entity):
             self.get_velocity()
             * (-1/ 2) 
             * self.get_velocity().magnitude()
-            * AIR_DENSITY_0
+            * self.state.air_density
             * self.vehicle_state.drag_coefficient
         )
         self.vehicle_state.force += force
@@ -222,15 +227,18 @@ class Vehicle(Entity):
         """
         for node in self.nodes.values():
             # Position of the node relative to the center of mass.
-            position: Vector2D = self.relative_to_center_of_mass(node.get_position())
+            position: Vector2D = self.relative_to_center_of_mass(node.rotated_position)
 
             for thruster in node.thrusters.values():
                 if thruster.is_on():
                     # Force vector of the thruster.
-                    force: Vector2D = Vector2D(
-                        math.cos(thruster.direction),
-                        math.sin(thruster.direction),
-                    ) * thruster.force
+                    force: Vector2D = (
+                        Vector2D.direction_normal(
+                            self.get_rotation() 
+                            + thruster.direction 
+                            + UP_SHIFT
+                        ) * thruster.force
+                    )
                     # Torque scalar by the cross product r × F.
                     torque: float = position.cross(force)
 
@@ -253,7 +261,6 @@ class Vehicle(Entity):
             self.get_velocity() * self.state.delta_time
             + self.get_acceleration() * 0.5 * self.state.delta_time * self.state.delta_time
         )
-
         return
 
     def update_angular_motion(self) -> None:
@@ -272,6 +279,8 @@ class Vehicle(Entity):
             self.get_angular_velocity() * self.state.delta_time
             + self.get_angular_acceleration() * 0.5 * self.state.delta_time * self.state.delta_time
         )
+
+        self.vehicle_state.rotation %= 2 * math.pi
 
         return
 
@@ -295,11 +304,15 @@ class Vehicle(Entity):
     def draw(self) -> None:
         info_size: int = 4
 
+        mass_absolute: Vector2D = self.vehicle_state.get_absolute_com()
+        position_relative: Vector2D = self.vehicle_state.get_relative_anchor()
+        anchor_absolute: Vector2D = mass_absolute + position_relative
+
         # Center of vehicle.
         draw.rectangle(
             self.state.camera,
-            self.get_position().x - info_size // 2,
-            self.get_position().y - info_size // 2,
+            anchor_absolute.x - info_size // 2,
+            anchor_absolute.y - info_size // 2,
             info_size,
             info_size,
             pyxel.COLOR_LIGHT_BLUE,
@@ -308,8 +321,8 @@ class Vehicle(Entity):
         # Center of mass.
         draw.rectangle(
             self.state.camera,
-            self.get_position().x + self.vehicle_state.center_mass.x - info_size // 2,
-            self.get_position().y + self.vehicle_state.center_mass.y - info_size // 2,
+            mass_absolute.x - info_size // 2,
+            mass_absolute.y - info_size // 2,
             info_size,
             info_size,
             pyxel.COLOR_RED,
@@ -318,16 +331,15 @@ class Vehicle(Entity):
         # Node links.
         for node, links in self.node_links.items():
             for link in links:
-                center: Vector2D = self.vehicle_state.position - self.vehicle_state.center_mass
                 node_position: Vector2D = self.nodes[node].rotated_position
                 link_position: Vector2D = self.nodes[link].rotated_position
                 
                 draw.line(
                     self.state.camera,
-                    center.x + node_position.x,
-                    center.y + node_position.y,
-                    center.x + link_position.x,
-                    center.y + link_position.y,
+                    anchor_absolute.x + node_position.x,
+                    anchor_absolute.y + node_position.y,
+                    anchor_absolute.x + link_position.x,
+                    anchor_absolute.y + link_position.y,
                     pyxel.COLOR_WHITE,
                 )
 

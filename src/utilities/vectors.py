@@ -90,6 +90,18 @@ class Vector2D:
         """
         return Vector2D(0.0, 0.0)
 
+    @staticmethod
+    def direction_normal(angle: float) -> 'Vector2D':
+        """
+        Creates a normal vector using trigonometry:
+        - pointing `angle`;
+        - with a length of `1`
+        """
+        return Vector2D(
+            math.cos(angle),
+            math.sin(angle),
+        )
+
     def copy(self) -> 'Vector2D':
         """
         Return a true unlinked copy of `self`.

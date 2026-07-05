@@ -111,11 +111,11 @@ def vehicle_weird1_2_2(state: State) -> Vehicle:
         }
     )
 
-def vehicle_rocket1_2_2(state: State) -> Vehicle:
+def vehicle_rocket1_2_3(state: State) -> Vehicle:
     vehicle_state: VehicleState = VehicleState(
-            drag_coefficient=0.0,
-            position=Vector2D(75.0, 5000.0),
-            velocity=Vector2D(0.0, 10.0),
+            drag_coefficient=0.2,
+            position=Vector2D(0.0, 50.0),
+            velocity=Vector2D(0.0, 0.0),
             acceleration=Vector2D.null(),
             force=Vector2D.null(),
             rotation=0.0
@@ -158,8 +158,16 @@ def vehicle_rocket1_2_2(state: State) -> Vehicle:
                         state=state,
                         vehicle_state=vehicle_state,
                         direction=math.pi / 2.0,
-                        force=100.0,
+                        force=50.0,
                         key=pyxel.KEY_D,
+                    ),
+                    2: Thruster(
+                        id=1,
+                        state=state,
+                        vehicle_state=vehicle_state,
+                        direction=-math.pi / 2.0,
+                        force=50.0,
+                        key=pyxel.KEY_A,
                     ),
                 },
             ),

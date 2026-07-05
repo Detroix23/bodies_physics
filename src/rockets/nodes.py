@@ -2,8 +2,6 @@
 # Rockets
 /src/rockets/node.py
 """
-import math
-
 import pyxel
 
 from utilities.definitions import UP_SHIFT
@@ -26,10 +24,8 @@ class Node(SceneObject):
     """ Relative to the body center. """
     rotated_position: Vector2D
     """ Relative rotated to the body center. """
-    absolute_position: Vector2D 
-    """ Absolute rotated. """
-    center: Vector2D
-    """ relative, in **m**. """
+    anchor_absolute: Vector2D
+    """ Absolute, in **m**. """
     drag: float
     """ Dimension-less coefficient that scales`velocity`. """
     size: float
@@ -58,8 +54,7 @@ class Node(SceneObject):
         self.vehicle_state = vehicle_state
         self._relative_position = relative_position
         self.rotated_position = relative_position
-        self.absolute_position = self.vehicle_state.position + relative_position
-        self.center = Vector2D.null()
+        self.anchor_absolute = Vector2D.null()
         self.drag = drag
         self.size = size
         self.mass = mass
@@ -68,11 +63,15 @@ class Node(SceneObject):
         return
     
     def get_id(self) -> int:
+        """
+        Get the unique read-only ID of the `Node`.
+        """
         return self._id
     
     def get_position(self) -> Vector2D:
         """
-        Returns the read-only relative position.
+        Returns the read-only relative position 
+        to the un-rotated anchor.
         """
         return self._relative_position
 
@@ -80,12 +79,15 @@ class Node(SceneObject):
         for thruster in self.thrusters.values():
             thruster.update()
 
+        self.anchor_absolute = self.vehicle_state.get_absolute_anchor()
+
         self.rotated_position = matrices.rotate(
-            self.get_position(), 
+            (
+                self.get_position() 
+                #- self.vehicle_state.center_mass
+            ), 
             self.vehicle_state.rotation
         )
-
-        self.absolute_position = self.rotated_position + self.vehicle_state.position
 
         return
 
@@ -100,40 +102,32 @@ class Node(SceneObject):
                     + thruster.direction 
                     + UP_SHIFT
                 )
-
-                thrust: Vector2D = Vector2D(
-                    math.cos(direction),
-                    math.sin(direction),
-                ) * -thruster.force
+                thrust: Vector2D = (
+                    Vector2D.direction_normal(direction) 
+                    * -thruster.force
+                )
 
                 draw.line(
                     self.state.camera,
-                    self.center.x,
-                    self.center.y,
-                    self.center.x + thrust.x,
-                    self.center.y + thrust.y,
+                    self.anchor_absolute.x + self.rotated_position.x,
+                    self.anchor_absolute.y + self.rotated_position.y,
+                    self.anchor_absolute.x + self.rotated_position.x + thrust.x,
+                    self.anchor_absolute.y + self.rotated_position.y + thrust.y,
                     pyxel.COLOR_ORANGE,
                 )
-        
         return
     
 
     def draw(self) -> None:
-        self.center = (
-            self.absolute_position
-            - self.vehicle_state.center_mass
-        )
-
         self.draw_thrust()
 
         draw.rectangle(
             self.state.camera,
-            self.center.x - self.size / 2,
-            self.center.y + self.size / 2,
+            self.anchor_absolute.x + self.rotated_position.x - self.size / 2,
+            self.anchor_absolute.y + self.rotated_position.y + self.size / 2,
             self.size,
             self.size,
             pyxel.COLOR_CYAN,
         )
-
         return
     

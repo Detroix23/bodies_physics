@@ -5,7 +5,7 @@
 import math
 from typing import Final
 
-GRAVITATIONAL_CONSTANT: Final[float] = 9.8
+GRAVITY_EARTH: Final[float] = 9.8
 """ *g* in **m/s²** """
 
 AIR_DENSITY_0: Final[float] = 1.225
