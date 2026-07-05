@@ -2,6 +2,8 @@
 # Rockets
 /src/rockets/app.py
 """
+from typing import Optional
+
 import pyxel
 
 from utilities.objects import SceneObject
@@ -17,16 +19,21 @@ class App(SceneObject):
     state: State
     lines: list[str]
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        delta_time: Optional[float] = None,
+        gravitational_constant: Optional[float] = None,
+        air_density: Optional[float] = None,
+    ) -> None:
         """
         Create the `App`, initialize the simulation.
 
         Does not run it: start with `run`.
         """
         self.state = State(
-            delta_time=0.5,
-            gravitational_constant=None,
-            air_density=None,
+            delta_time=delta_time,
+            gravitational_constant=gravitational_constant,
+            air_density=air_density,
         )
         self.lines = []
         print("(?) rockets.app.App.__init__() State initialized.")

@@ -21,7 +21,7 @@ class State:
     
     def __init__(
         self,
-        delta_time: float,
+        delta_time: Optional[float] = None,
         gravitational_constant: Optional[float] = None,
         air_density: Optional[float] = None,
     ) -> None:
@@ -30,7 +30,7 @@ class State:
         Should call be called only once during the whole execution.
         **Resets the `State`.**
         """
-        self.delta_time = delta_time
+        self.delta_time = general.default(delta_time, 0.1)
         self.gravitational_constant = general.default(
             gravitational_constant, 
             GRAVITY_EARTH,

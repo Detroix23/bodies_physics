@@ -150,7 +150,7 @@ def vehicle_rocket1_2_3(state: State) -> Vehicle:
                         state=state,
                         vehicle_state=vehicle_state,
                         direction=0.0,
-                        force=200.0,
+                        force=50.0,
                         key=pyxel.KEY_W,
                     ),
                     1: Thruster(
@@ -158,7 +158,7 @@ def vehicle_rocket1_2_3(state: State) -> Vehicle:
                         state=state,
                         vehicle_state=vehicle_state,
                         direction=math.pi / 2.0,
-                        force=50.0,
+                        force=5.0,
                         key=pyxel.KEY_D,
                     ),
                     2: Thruster(
@@ -166,7 +166,7 @@ def vehicle_rocket1_2_3(state: State) -> Vehicle:
                         state=state,
                         vehicle_state=vehicle_state,
                         direction=-math.pi / 2.0,
-                        force=50.0,
+                        force=5.0,
                         key=pyxel.KEY_A,
                     ),
                 },
