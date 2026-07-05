@@ -9,7 +9,7 @@ import pyxel
 from utilities.definitions import UP_SHIFT
 from utilities.vectors import Vector2D
 from utilities.objects import Entity
-from utilities import draw
+from utilities import draw, general
 from rockets.state import State
 from rockets.vehicle_states import VehicleState
 from rockets.nodes import Node
@@ -115,7 +115,8 @@ class Vehicle(Entity):
 
     def get_center_of_mass(self) -> Vector2D:
         """
-        Returns the position of the center of mass.
+        Returns the position of the center of mass,
+        relative to the anchor.
         """
         return self.vehicle_state.center_mass
 
@@ -124,19 +125,6 @@ class Vehicle(Entity):
         Returns a scalar: the moment of inertia used in angular motion.
         """
         return self.vehicle_state.moment_inertia
-
-    def relative_to_center_of_mass(
-        self, 
-        position: Vector2D
-    ) -> Vector2D:
-        """
-        Returns the given center-relative `position` 
-        shifted to be relative to the center of mass. 
-        """
-        return (position
-            + self.get_position() 
-            - self.get_center_of_mass()
-        )
 
     def find_mass_total(self) -> float:
         """
@@ -169,8 +157,11 @@ class Vehicle(Entity):
         self.vehicle_state.moment_inertia = sum(
             (
                 node.mass 
-                * self.relative_to_center_of_mass(node.get_position()
-                    ).magnitude2()
+                * (
+                    node.rotated_position
+                    + self.vehicle_state.get_relative_anchor()
+                    - self.get_center_of_mass()
+                ).magnitude2()
             )
             for node in self.nodes.values()
         )
@@ -207,43 +198,65 @@ class Vehicle(Entity):
         )
         return
     
-    def apply_drag(self) -> Vector2D:
+    def compute_drag(self, vector: Vector2D) -> Vector2D:
         """
-        Apply air drag with the current velocity.
+        Compute the air drag force-vector with the given `vector`.
         """
-        force: Vector2D = (
-            self.get_velocity()
-            * (-1/ 2) 
-            * self.get_velocity().magnitude()
+        return (Vector2D.null()
+            if vector.is_close(Vector2D.null(), 0.1)
+            else (
+                vector
+                * (-1 / 2) 
+                * vector.magnitude()
+                * self.state.air_density
+                * self.vehicle_state.drag_coefficient
+            )
+        )
+
+    def compute_angular_drag(self, speed: float) -> float:
+        """
+        Compute an arbitrary air drag for the angular velocity.
+        """
+        return (
+            general.sign(speed)
+            * (-1 / 2)
+            * speed * speed
             * self.state.air_density
             * self.vehicle_state.drag_coefficient
         )
-        self.vehicle_state.force += force
-        return force
-
+    
     def apply_thrust(self) -> None:
         """
         Update force and torque from thrusters from all nodes.
         """
         for node in self.nodes.values():
             # Position of the node relative to the center of mass.
-            position: Vector2D = self.relative_to_center_of_mass(node.rotated_position)
+            position: Vector2D = (
+                node.rotated_position
+                - self.vehicle_state.get_relative_anchor()
+            )
+            #print(f"{node.get_id()}: pos={position}")
 
             for thruster in node.thrusters.values():
                 if thruster.is_on():
                     # Force vector of the thruster.
+                    direction: float = (
+                        self.get_rotation() 
+                        + thruster.direction 
+                        + UP_SHIFT
+                    )
+                    direction_vector: Vector2D = Vector2D.direction_normal(direction)
                     force: Vector2D = (
-                        Vector2D.direction_normal(
-                            self.get_rotation() 
-                            + thruster.direction 
-                            + UP_SHIFT
-                        ) * thruster.force
+                        direction_vector
+                        * thruster.force
                     )
                     # Torque scalar by the cross product r × F.
                     torque: float = position.cross(force)
 
                     self.vehicle_state.force += force
                     self.vehicle_state.torque += torque
+
+        return
 
     def update_linear_motion(self) -> None:
         """
@@ -275,7 +288,7 @@ class Vehicle(Entity):
             self.get_angular_acceleration() 
             * self.state.delta_time
         )
-        self.vehicle_state.rotation += (
+        self.vehicle_state.rotation -= (
             self.get_angular_velocity() * self.state.delta_time
             + self.get_angular_acceleration() * 0.5 * self.state.delta_time * self.state.delta_time
         )
@@ -291,7 +304,8 @@ class Vehicle(Entity):
         self.set_torque(0.0)
 
         self.apply_gravity()
-        self.apply_drag()
+        self.vehicle_state.velocity += self.compute_drag(self.get_velocity())
+        self.vehicle_state.angular_velocity += self.compute_angular_drag(self.get_angular_velocity())
         self.apply_thrust()
 
         self.update_linear_motion()

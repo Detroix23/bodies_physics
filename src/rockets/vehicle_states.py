@@ -88,7 +88,7 @@ class VehicleState:
     def get_relative_anchor(self) -> Vector2D:
         """
         Get the arbitrary (0;0) body anchor 
-        relative to the center of mass. 
+        rotated and relative to the center of mass. 
         """
         return matrices.rotate(
             self.center_mass * (-1), 

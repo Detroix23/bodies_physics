@@ -162,7 +162,7 @@ def vehicle_rocket1_2_3(state: State) -> Vehicle:
                         key=pyxel.KEY_D,
                     ),
                     2: Thruster(
-                        id=1,
+                        id=2,
                         state=state,
                         vehicle_state=vehicle_state,
                         direction=-math.pi / 2.0,

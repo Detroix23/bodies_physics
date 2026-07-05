@@ -23,7 +23,9 @@ class Node(SceneObject):
     _relative_position: Vector2D
     """ Relative to the body center. """
     rotated_position: Vector2D
-    """ Relative rotated to the body center. """
+    """ 
+    Anchor-relative coordinates rotated around the anchor. 
+    """
     anchor_absolute: Vector2D
     """ Absolute, in **m**. """
     drag: float
@@ -84,7 +86,8 @@ class Node(SceneObject):
         self.rotated_position = matrices.rotate(
             (
                 self.get_position() 
-                #- self.vehicle_state.center_mass
+                # + self.vehicle_state.center_mass
+                # + self.vehicle_state.get_relative_anchor()
             ), 
             self.vehicle_state.rotation
         )

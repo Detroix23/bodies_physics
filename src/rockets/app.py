@@ -24,12 +24,16 @@ class App(SceneObject):
         Does not run it: start with `run`.
         """
         self.state = State(
-            delta_time=0.1,
+            delta_time=0.2,
             gravitational_constant=0.0,
             air_density=None,
         )
         self.lines = []
         print("(?) rockets.app.App.__init__() State initialized.")
+        print("With:")
+        for attribute, value in self.state.__dict__.items():
+            if not attribute.startswith("_"):
+                print(f" - {attribute}: {value}")
 
         pyxel.init(
             512,
