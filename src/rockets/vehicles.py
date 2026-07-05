@@ -224,7 +224,7 @@ class Vehicle(Entity):
             * self.state.air_density
             * self.vehicle_state.drag_coefficient
         )
-    
+
     def apply_thrust(self) -> None:
         """
         Update force and torque from thrusters from all nodes.
@@ -304,8 +304,8 @@ class Vehicle(Entity):
         self.set_torque(0.0)
 
         self.apply_gravity()
-        self.vehicle_state.velocity += self.compute_drag(self.get_velocity())
-        self.vehicle_state.angular_velocity += self.compute_angular_drag(self.get_angular_velocity())
+        self.vehicle_state.force += self.compute_drag(self.get_velocity())
+        self.vehicle_state.torque += self.compute_angular_drag(self.get_angular_velocity())
         self.apply_thrust()
 
         self.update_linear_motion()

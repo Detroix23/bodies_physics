@@ -13,6 +13,7 @@ class Thruster(UpdatableObject):
     # Rocket `Thruster`, attached to a `Node`.
     """
     id: int
+    monitor: bool
     state: State
     vehicle_state: VehicleState
     direction: float
@@ -31,11 +32,13 @@ class Thruster(UpdatableObject):
         direction: float,
         force: float,
         key: int = pyxel.KEY_NONE,
+        monitor: bool = False,
     ) -> None:
         """
         Instantiate the `Thruster`.
         """
         self.id = id
+        self.monitor = monitor
         self.state = state
         self.vehicle_state = vehicle_state
         self.direction = direction
@@ -49,7 +52,7 @@ class Thruster(UpdatableObject):
         """
         Turn the thruster `on`.
         """
-        if not self.is_on():
+        if self.monitor and not self.is_on():
             print(f"(?) rockets.thruster.Thruster.enable()  id={self.id}")
         self._on = True
         return
@@ -58,7 +61,7 @@ class Thruster(UpdatableObject):
         """
         Turn the thruster off.
         """
-        if self.is_on():
+        if self.monitor and self.is_on():
             print(f"(?) rockets.thruster.Thruster.disable() id={self.id}")
         self._on = False
         return

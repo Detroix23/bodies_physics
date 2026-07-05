@@ -34,7 +34,7 @@ class App(SceneObject):
         for attribute, value in self.state.__dict__.items():
             if not attribute.startswith("_"):
                 print(f" - {attribute}: {value}")
-
+        
         pyxel.init(
             512,
             512,
