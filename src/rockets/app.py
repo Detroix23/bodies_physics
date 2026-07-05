@@ -24,8 +24,8 @@ class App(SceneObject):
         Does not run it: start with `run`.
         """
         self.state = State(
-            delta_time=0.2,
-            gravitational_constant=0.0,
+            delta_time=0.5,
+            gravitational_constant=None,
             air_density=None,
         )
         self.lines = []
@@ -34,7 +34,7 @@ class App(SceneObject):
         for attribute, value in self.state.__dict__.items():
             if not attribute.startswith("_"):
                 print(f" - {attribute}: {value}")
-        
+
         pyxel.init(
             512,
             512,
@@ -74,24 +74,26 @@ class App(SceneObject):
 
         # Text.
         self.lines = [
-            "Camera: ",
+            "# Bodies: rockets framework.",
+            "## Camera: ",
             f"p={self.state.camera.position.decimal(2)}m",
             f"z={self.state.camera.zoom:.4f}",   
+            "## Entities",
         ]
         for entity_id, entity in self.state.entities.items():
             self.lines += [
-                f"Entity {entity_id}: ",
+                f"ID={entity_id}: ",
                 f"- mas={entity.get_mass():.2f}kg",
                 "Linear:",
                 f"- pos={entity.get_position().decimal(2)}m",
                 f"- vel={entity.get_velocity().decimal(2)}m/s",
-                f"- acc={entity.get_acceleration().decimal(2)}m/s²",
+                f"- acc={entity.get_acceleration().decimal(2)}m/s^2",
                 f"- for={entity.get_force().decimal(2)}N",
                 "Angular",
-                f"- rot={entity.get_rotation():.2f}",
-                f"- vel={entity.get_angular_velocity():.2f}/s",
-                f"- acc={entity.get_angular_acceleration():.2f}/s²",
-                f"- tor={entity.get_torque():.2f}kg*m²/s²"
+                f"- rot={entity.get_rotation():.2f}rad",
+                f"- vel={entity.get_angular_velocity():.2f}rad/s",
+                f"- acc={entity.get_angular_acceleration():.2f}rad/s^2",
+                f"- tor={entity.get_torque():.2f}N.m"
             ]
 
         return

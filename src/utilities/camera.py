@@ -43,7 +43,12 @@ class Camera(UpdatableObject):
 
         if pyxel.mouse_wheel != 0:
             self.zoom *= self.speed_scroll ** pyxel.mouse_wheel
-
+        if pyxel.btn(pyxel.KEY_PAGEDOWN):
+            self.zoom *= self.speed_scroll
+        if pyxel.btn(pyxel.KEY_PAGEUP):
+            self.zoom *= 1/self.speed_scroll
+    
+        return
 
     def update(self) -> None:
         self.listen_keys()
